@@ -1,28 +1,38 @@
-apiVersion: config.burrito.tf/v1alpha1
+# terraform-repository.yaml
+apiVersion: config.terraform.padok.cloud/v1alpha1
+kind: TerraformRepository
+metadata:
+  name: gcp-vm-repo
+  namespace: burrito-system
+spec:
+  repository:
+    url: "https://github.com/4emerson/terraform-gcp-vm.git"
+    # secretName não necessário para repos públicos
+  terraform:
+    enabled: true
+    version: "1.6.0"
+
+---
+# .burrito/burrito.yaml - versão básica primeiro
+apiVersion: config.terraform.padok.cloud/v1alpha1
 kind: TerraformLayer
 metadata:
   name: gcp-vm-layer
   namespace: burrito-system
 spec:
-  branch: "main"
   path: "."
+  branch: "main"
   repository:
-    url: "http://gitea.gitea.svc.cluster.local:3000/seu-usuario/terraform-gcp-vm"
-    secretName: "git-credentials"
-  terraform:
-    version: "1.6.0"
-  runner:
-    action: "apply"
-    on:
-      pullRequest:
-        enabled: true
-      push:
-        enabled: true
-  overrides:
-    - key: "project_id"
-      value: "gcp-4linux"
-    - key: "ssh_public_key"
-      valueFrom:
-        secretKeyRef:
-          name: "ssh-keys"
-          key: "public_key"
+    name: gcp-vm-repo
+    namespace: burrito-system
+  remediationStrategy:
+    autoApply: true
+  overrideRunnerSpec:
+    env:
+      - name: "TF_VAR_project_id"
+        value: "gcp-4linux"
+      - name: "TF_VAR_ssh_public_key"
+        valueFrom:
+          secretKeyRef:
+            name: "ssh-keys"
+            key: "public_key"

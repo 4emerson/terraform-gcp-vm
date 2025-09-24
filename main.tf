@@ -8,7 +8,11 @@ terraform {
   
   backend "kubernetes" {
     secret_suffix    = "state"
-    config_path      = "/tmp/kubeconfig"
+    config_context   = ""
+    namespace        = "burrito-system"
+    labels = {
+      "terraform-state" = "gcp-vm"
+    }
   }
 }
 
