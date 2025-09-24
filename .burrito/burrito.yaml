@@ -1,0 +1,28 @@
+apiVersion: config.burrito.tf/v1alpha1
+kind: TerraformLayer
+metadata:
+  name: gcp-vm-layer
+  namespace: burrito-system
+spec:
+  branch: "main"
+  path: "."
+  repository:
+    url: "http://gitea.gitea.svc.cluster.local:3000/seu-usuario/terraform-gcp-vm"
+    secretName: "git-credentials"
+  terraform:
+    version: "1.6.0"
+  runner:
+    action: "apply"
+    on:
+      pullRequest:
+        enabled: true
+      push:
+        enabled: true
+  overrides:
+    - key: "project_id"
+      value: "gcp-4linux"
+    - key: "ssh_public_key"
+      valueFrom:
+        secretKeyRef:
+          name: "ssh-keys"
+          key: "public_key"
