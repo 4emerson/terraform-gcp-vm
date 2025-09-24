@@ -6,13 +6,10 @@ terraform {
     }
   }
   
-  backend "kubernetes" {
-    secret_suffix    = "state"
-    config_context   = ""
-    namespace        = "burrito-system"
-    labels = {
-      "terraform-state" = "gcp-vm"
-    }
+  backend "gcs" {
+    bucket      = "burrito-terraform-state-1758757871"
+    prefix      = "terraform/gcp-vm"
+    credentials = "/tmp/gcp-credentials/credentials.json"
   }
 }
 
